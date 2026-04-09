@@ -1,17 +1,35 @@
-from pydantic import BaseModel, Field
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class LoginRequest(BaseModel):
+class UserBase(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     username: str = Field(min_length=1)
+
+
+class User(UserBase):
     password: str = Field(min_length=1)
 
 
-class UserProfile(BaseModel):
-    username: str = Field(min_length=1)
-    full_name: str = Field(min_length=1)
-    email: str = Field(min_length=1)
+class UserCreate(User):
+    role: Literal["admin", "user", "guest"] = "user"
 
 
-class SessionData(BaseModel):
-    profile: UserProfile
-    last_activity: int = Field(ge=0)
+class UserInDB(UserBase):
+    hashed_password: str = Field(min_length=1)
+    role: Literal["admin", "user", "guest"]
+
+
+class MessageResponse(BaseModel):
+    message: str = Field(min_length=1)
+
+
+class AccessTokenResponse(BaseModel):
+    access_token: str = Field(min_length=1)
+    token_type: Literal["bearer"] = "bearer"
+
+
+class TokenPayload(BaseModel):
+    sub: str = Field(min_length=1)
