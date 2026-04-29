@@ -1,54 +1,29 @@
 # Технологии разработки серверных приложений
 
-В данной ветке содержится реализация заданий для выполнения контрольной работы №3.
+В данной ветке содержится реализация заданий для выполнения контрольной работы №4.
 
-## Установка проекта
+### Перед началом
+
+В репозитории находится файл для Docker Compose проекта с последней версией
+PostgreSQL (на Alpine-сборке). Его можно использовать для удобного развёртывания
+локальной базы данных.
+
+### Установка проекта
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python init_db.py
 ```
 
-## Переменные окружения
-
-Для `DEV`-режима задайте:
+Перед началом, необходимо скопировать `.env.example` в `.env`, и заполнить
+переменные окружения. После этого можно выполнить миграции:
 
 ```bash
-export MODE=DEV
-export DOCS_USER=valid_user
-export DOCS_PASSWORD=valid_password
+.venv/bin/alembic upgrade head
 ```
 
-Для `PROD`-режима достаточно:
-
+А затем - запустить веб-сервер:
 ```bash
-export MODE=PROD
+.venv/bin/uvicorn app.__main__:app --reload
 ```
-
-Для JWT можно дополнительно переопределить:
-
-```bash
-export JWT_SECRET_KEY=change-me-please-use-at-least-32-chars
-export JWT_ALGORITHM=HS256
-export ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-## Запуск проекта
-
-```bash
-uvicorn main:app --reload
-```
-
-Приложение будет доступно по адресу `http://127.0.0.1:8000`.
-
-В `DEV` документация по `/docs` и `/openapi.json` защищена Basic Auth.
-В `PROD` маршруты `/docs`, `/openapi.json` и `/redoc` скрыты и возвращают `404`.
-
-## Todo CRUD
-
-- `POST /todos` создаёт `Todo` и возвращает его с `completed=false`.
-- `GET /todos/{todo_id}` возвращает один `Todo` или `404`.
-- `PUT /todos/{todo_id}` обновляет `title`, `description`, `completed`.
-- `DELETE /todos/{todo_id}` удаляет `Todo` и возвращает сообщение об успехе.
